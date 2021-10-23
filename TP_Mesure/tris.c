@@ -2,11 +2,55 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "instru.h"
+
+#define ALGO_TRI tri_insertion
+//#define ALGO_TRI tri_segmentation
+
+/// INSTRUMENTATION
+
+long cmpTotal = 0;
+long totalTries = 0;
+
+int* cmpList = NULL;
+
+void instruInit(int X) {
+    cmpTotal = 0;
+    totalTries = 0;
+    if (cmpList) free(cmpList);
+    cmpList = malloc(sizeof(int) * X);
+}
+
+int incrCmp(int x) {
+    cmpTotal++;
+    cmpList[totalTries]++;
+    return x;
+}
+
+void instruCommit() {
+    totalTries++;
+}
+
+float instruAvg() {
+    return ((float) cmpTotal) / ((float) (totalTries + 1));
+}
+
+float instruEcartType() {
+    assert(totalTries > 0);
+
+    float avg = instruAvg();
+    float esperance = 0;
+    for (int i  = 0; i <= totalTries; i++) {
+        long x = avg - cmpList[i];
+        esperance += x*x;
+    }
+    esperance /= (totalTries + 1);
+
+    return sqrtf(esperance);
+}
+
+/// FIN INSTRUMENTATION
 
 #define NMAX 50000		/* peut etre modifie si necessaire */
-
-
 
 /*
 generation_aleatoire
@@ -17,7 +61,7 @@ Pre-condition : le generateur aleatoire doit avoir ete initialise avec "srand"
 */
 
 void generation_aleatoire(int t[], int n) {
-  volatile int i ;
+  int i ;
 
   for (i=0 ; i<n ; i++) {
 	  t[i] = rand() ;
@@ -52,15 +96,15 @@ void tri_insertion(int t[], int n) {
 
   for(i=1; i < n; i++) {
     Clef = t[i];
-    
+
     j = i - 1;
-    
+
     /* Decalage des valeurs du tableau */
     while((j >= 0) && incrCmp(t[j] > Clef)) {
       t[j+1] = t[j];
       j = j - 1;
     }
-    
+
     /* insertion de la clef */
     t[j+1] = Clef;
   }
@@ -72,17 +116,18 @@ void echanger(int* a, int* b) {
   *b = tmp;
 }
 
-int partitionner(int t[], int n, int pivot) {
-  echanger(&t[pivot], &t[n - 1]);
-  int j = 0;
-  for (int i = 0; i < n; i++) {
-    if (t[i] <= t[n - 1]) {
+int partitionner(int t[], int l, int h) {
+  int pivot = t[h];
+  int i = l - 1;
+
+  for (int j = l; j <= h - 1; j++) {
+    if (incrCmp(t[j] < pivot)) {
+      i++;
       echanger(&t[i], &t[j]);
-      j++;
     }
   }
-  echanger(&t[n - 1], &t[j]);
-  return j;
+  echanger(&t[i + 1], &t[h]);
+  return (i + 1);
 }
 
 /*
@@ -91,10 +136,11 @@ Donnees : t : tableau d'entiers de taille > n, n : entier > 0
 Resultat : le tableau t est trie en ordre croissant
 */
 void tri_segmentation(int t[], int n) {
-  int pivot = 0;
-  pivot = partitionner(t, n, pivot);
-  tri_segmentation(t, pivot - 1);
-  tri_segmentation(&t[pivot + 1], n - pivot);
+  if (n > 0) {
+    int pivot = partitionner(t, 0, n - 1);
+    tri_segmentation(t, pivot);
+    tri_segmentation(&t[pivot + 1], n - pivot - 1);
+  }
 }
 
 typedef struct {
@@ -122,8 +168,8 @@ void mesure_tri(int X, int N) {
 
   instruInit(X);
   for (int attempt = 0; attempt < X; attempt++) {
-    generation_aleatoire(T, N) ; /* initialisation du tableau T */
-    tri_insertion(T, N) ;	/* tri de T */
+    generation_aleatoire_non_uniforme(T, N) ; /* initialisation du tableau T */
+    ALGO_TRI(T, N) ;	/* tri de T */
     instruCommit();
   }
 }
@@ -142,6 +188,8 @@ void lancer_mesures() {
   printf("Valeur de X ? ");
   res = scanf("%d", &X);
   assert(res == 1);
+
+  instruInit(1);
 
   do {
   	printf("Valeur de N ? ") ;
@@ -169,5 +217,45 @@ void lancer_mesures_gnuplot() {
     float ic = 0.95 * et / sqrt(cas.N);
 
     printf("%d %f %f %f\n", cas.N, instruAvg(), avg - ic, avg + ic);
+  }
+}
+
+void lancer_tests() {
+  instruInit(1);
+
+  int entree[] = {
+          1,
+          4,
+          2,
+          8,
+          5,
+          5,
+          7,
+          -1,
+  };
+
+  int sortie[] = {
+          1,
+          2,
+          4,
+          5,
+          5,
+          7,
+          8,
+  };
+
+  // Tri
+
+  ALGO_TRI(entree, 7);
+
+  // Vérification
+
+  for (int i = 0; i < 7; i++) {
+    printf("%d, ", entree[i]);
+  }
+  printf("\n");
+
+  for (int i = 0; i < 7; i++) {
+    assert(entree[i] == sortie[i]);
   }
 }
