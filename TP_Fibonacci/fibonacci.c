@@ -24,7 +24,7 @@ int main() {
 
     printf("--- test de cohérence entre les diff. algos ---\n");
     printf(
-        "fibonacci(10) = { rec = %ld; iter = %ld, rec2 = %ld, golden = %lf\n",
+        "fibonacci(10) = { rec = %lld; iter = %lld, rec2 = %lld, golden = %lf\n",
         fibo_rec(10),
         fibo_iter(10),
         fibo_rec2(10),
@@ -44,7 +44,7 @@ int main() {
             elapsed = (double)(end - start) / CLOCKS_PER_SEC;
             if (elapsed >= 1.0) break;
         }
-        printf("\nfibo_rec(%ld) prend %lfs à calculer\n", n, elapsed);
+        printf("\nfibo_rec(%lld) prend %lfs à calculer\n", n, elapsed);
         for (n = 1000000000;; n += 10000000) {
             printf(".");
             fflush(stdout);
@@ -54,19 +54,19 @@ int main() {
             elapsed = (double)(end - start) / CLOCKS_PER_SEC;
             if (elapsed >= 1.0) break;
         }
-        printf("\nfibo_iter(%ld) prend %lfs à calculer\n", n, elapsed);
+        printf("\nfibo_iter(%lld) prend %lfs à calculer\n", n, elapsed);
     }
 
     printf("\n--- 2.3) qu'est ce qui ne va pas ? (dépassement: fixé) ---\n");
-    printf("fibonacci(45) = %ld\n", fibo_iter(45));
-    printf("fibonacci(46) = %ld\n", fibo_iter(46));
-    printf("fibonacci(47) = %ld\n", fibo_iter(47));
-    printf("fibonacci(48) = %ld\n", fibo_iter(48));
+    printf("fibonacci(45) = %lld\n", fibo_iter(45));
+    printf("fibonacci(46) = %lld\n", fibo_iter(46));
+    printf("fibonacci(47) = %lld\n", fibo_iter(47));
+    printf("fibonacci(48) = %lld\n", fibo_iter(48));
 
     printf("\n--- 2.4) rec2, plus performant ---\n");
-    printf("fibonacci(60) = %ld\n", fibo_iter(60));
-    printf("fibonacci(75) = %ld\n", fibo_iter(75));
-    printf("fibonacci(100) = %ld\n", fibo_iter(100));
+    printf("fibonacci(60) = %lld\n", fibo_iter(60));
+    printf("fibonacci(75) = %lld\n", fibo_iter(75));
+    printf("fibonacci(100) = %lld\n", fibo_iter(100));
 
     printf("\n--- 2.5) interlude exponentielle ---\n");
     printf("quick_power(5., 3) = %lf\n", puissance(5, 3));
@@ -78,7 +78,7 @@ int main() {
     printf("fibonacci(100) = %lf\n", fibo_golden(100));
 
     printf("\n--- 2.7) matrices ---\n");
-    printf("fibonacci(60) = %ld\n", fibo_matrix(60));
-    printf("fibonacci(75) = %ld\n", fibo_matrix(75));
-    printf("fibonacci(100) = %ld\n", fibo_matrix(100));
+    printf("fibonacci(60) = %lld\n", fibo_matrix(60));
+    printf("fibonacci(75) = %lld\n", fibo_matrix(75));
+    printf("fibonacci(100) = %lld\n", fibo_matrix(100));
 }

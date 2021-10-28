@@ -20,7 +20,7 @@ fibonacci-bm: fibo.o fibonacci-bm.o
 	$(CC) $^ -o $@ $(CCFLAGS)
 
 clean:
-	rm fibonacci fibonacci-bm *.o
+	-rm -f fibonacci fibonacci-bm *.o
 
 run: fibonacci
 	./$<
