@@ -1,3 +1,9 @@
+/.idea
+/cmake-build-*
+
+/TP_Mesure/mesure_tris
+/TP_Mesure/plot*.txt
+
 # Prerequisites
 *.d
 
